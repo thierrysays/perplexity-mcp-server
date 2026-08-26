@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 /**
- * MCP server for the Perplexity Sonar API.
+ * MCP server for structured competitive/market-intelligence veille workflows
+ * on top of the Perplexity Sonar API.
  *
- * Exposes one general-purpose search tool (perplexity_search) plus two
- * workflow tools tailored to recurring competitive/market-intelligence
- * veille tasks (perplexity_company_news, perplexity_market_signals).
+ * Exposes two workflow tools (perplexity_company_news, perplexity_market_signals)
+ * that fix prompt structure and constrain output shape server-side. This is
+ * deliberately narrow: for generic ad hoc search, use Perplexity's own
+ * official remote MCP server (https://api.perplexity.ai/mcp,
+ * github.com/perplexityai/modelcontextprotocol) instead of duplicating it
+ * here.
  *
  * Supports two transports, chosen via the TRANSPORT env var:
  *   - "stdio" (default): local use, e.g. registered in Claude Desktop's MCP
@@ -24,7 +28,6 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 
-import { registerSearchTool } from "./tools/search.js";
 import { registerCompanyNewsTool } from "./tools/company-news.js";
 import { registerMarketSignalsTool } from "./tools/market-signals.js";
 
@@ -34,7 +37,6 @@ function createServer(): McpServer {
     version: "1.0.0",
   });
 
-  registerSearchTool(server);
   registerCompanyNewsTool(server);
   registerMarketSignalsTool(server);
 

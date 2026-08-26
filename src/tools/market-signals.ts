@@ -92,8 +92,9 @@ export function registerMarketSignalsTool(server: McpServer): void {
       description: `Find recent, dated market signals (M&A, funding rounds, executive appointments,
 restructurings, etc.) relevant to a given professional profile and region, as a structured list.
 
-Unlike perplexity_search, this tool constrains Perplexity's response to a JSON schema server-side,
-so the result is a real array of discrete signals — not markdown you have to re-parse. It returns
+Unlike a free-text Sonar query, this tool constrains Perplexity's response to a JSON schema
+server-side, so the result is a real array of discrete signals — not markdown you have to
+re-parse. It returns
 an empty list rather than fabricated signals when nothing dated and reliable is found; that empty
 list is itself a meaningful, actionable result (it means the sweep ran and found nothing this
 period), not a failure.

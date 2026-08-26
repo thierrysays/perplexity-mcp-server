@@ -1,7 +1,7 @@
 {
   "name": "perplexity-mcp-server",
   "version": "1.0.0",
-  "description": "MCP server for the Perplexity Sonar API — generic search plus workflow tools for company news and market-signal monitoring",
+  "description": "MCP server for structured company-news and market-signal veille workflows on the Perplexity Sonar API",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -13,7 +13,6 @@
     "ai-agents",
     "competitive-intelligence",
     "market-intelligence",
-    "web-search",
     "claude",
     "streamable-http"
   ],

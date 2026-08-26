@@ -49,8 +49,9 @@ export function registerCompanyNewsTool(server: McpServer): void {
       description: `Get a structured, cited news brief on one company: governance, executives,
 strategic events, financial situation, and senior HR moves.
 
-This is a workflow tool built on top of perplexity_search: it fixes the prompt structure and
-section headings so every call returns a comparable, five-section brief, and maps a plain
+This is a workflow tool built on top of Perplexity's Sonar chat/completions API: it fixes the
+prompt structure and section headings so every call returns a comparable, five-section brief, and
+maps a plain
 lookback_days number to Perplexity's recency buckets (there is no native "3 months" filter, so
 lookback_days=90 is mapped to the nearest bucket, 'month').
 

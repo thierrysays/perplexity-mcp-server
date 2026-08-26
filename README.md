@@ -1,20 +1,27 @@
 # perplexity-mcp-server
 
-MCP server for the Perplexity Sonar API. Built to close a specific architectural gap: no native
-Perplexity MCP connector exists in the Anthropic connector registry (verified 2026-08-24 against
-the MCP registry and the plugin catalog), so today the only way to call Perplexity from an
-automated routine is a raw API call with a key read from a local file — which breaks the moment
-that routine runs in a cloud-scheduled session with no access to the local machine.
+MCP server for structured competitive/market-intelligence veille workflows on top of the
+Perplexity Sonar API.
 
-This server fixes that by moving the credential into the server's own runtime environment. Deploy
-it once (see "Remote deployment" below) with `PERPLEXITY_API_KEY` set as a platform secret, and any
-MCP client — including a cloud-scheduled Cowork/Claude session — can call it over HTTP without ever
-touching the local machine or a device bridge.
+**Correction (2026-08-26):** an earlier version of this README claimed no native Perplexity MCP
+connector existed anywhere. That was wrong — Perplexity publishes an official MCP server
+([github.com/perplexityai/modelcontextprotocol](https://github.com/perplexityai/modelcontextprotocol)),
+including a Perplexity-hosted remote endpoint at `https://api.perplexity.ai/mcp` that's reachable
+from a cloud-scheduled session with zero self-hosting. If you just need generic ad hoc Sonar
+search, register that instead of building or running anything here.
+
+What the official server doesn't give you is a *structured, comparable* weekly veille output: it
+exposes generic search/reasoning (Agent API, Search API), not a fixed-section company brief or a
+JSON-schema-constrained signal sweep. That's this server's actual reason to exist — it's a thin,
+narrow layer of two workflow tools, not a replacement for Perplexity's own MCP server.
+
+Deploy this once (see "Remote deployment" below) with `PERPLEXITY_API_KEY` set as a platform
+secret, and any MCP client — including a cloud-scheduled Cowork/Claude session — can call it over
+HTTP without ever touching the local machine or a device bridge. Register it *alongside*
+Perplexity's official server, not instead of it.
 
 ## Tools
 
-- **`perplexity_search`** — general-purpose: any question, full parameter surface (model, recency
-  filter, domain filter, search mode). Use this for anything the two workflow tools below don't fit.
 - **`perplexity_company_news`** — structured company news brief (gouvernance, dirigeants, événements
   stratégiques, situation financière, mouvements RH), fixed section headings, `lookback_days`
   instead of free-text date ranges.
@@ -23,7 +30,8 @@ touching the local machine or a device bridge.
   discrete signals, not markdown to re-parse. Returns an empty array (not an error) when nothing
   dated and reliable is found for the period — that's a meaningful result, not a failure.
 
-All three tools support `response_format: "markdown" | "json"` and return citations/sources.
+Both tools support `response_format: "markdown" | "json"` and return citations/sources. For
+general-purpose search, use Perplexity's official MCP server instead — see the correction above.
 
 ## Setup
 
@@ -78,7 +86,7 @@ secret in the credential path).
 - `npm run build` compiles cleanly (strict TypeScript, no `any`).
 - Both transports start without crashing (stdio and HTTP).
 - `GET /health` responds correctly.
-- Full MCP handshake (`initialize`, `tools/list`) returns all three tools with correct JSON schemas,
+- Full MCP handshake (`initialize`, `tools/list`) returns both tools with correct JSON schemas,
   descriptions, and annotations.
 - `tools/call` with an invalid API key returns a clean, actionable `isError: true` result (401
   guidance pointing at the Perplexity dashboard) — the server does not crash and stays responsive
@@ -89,15 +97,17 @@ secret in the credential path).
 No real `PERPLEXITY_API_KEY` was available in the build environment, so an actual successful
 Sonar call — real answer content, real citations, the `market_signals` JSON-schema-constrained
 response actually parsing as valid JSON — has not been exercised end-to-end. Before relying on this
-in the production veille routine, run each of the three tools once with a real key (locally via
+in the production veille routine, run each of the two tools once with a real key (locally via
 stdio is enough for this check) and confirm the output matches the shapes documented above.
 
 ## Cost note
 
 `perplexity_company_news` and `perplexity_market_signals` both default to the `sonar-pro` model
 (deeper search, more sources, higher cost per call than `sonar`) because the veille use case
-prioritizes completeness and citation quality over latency/cost. `perplexity_search` defaults to
-the cheaper `sonar` and lets the caller opt into `sonar-pro` or `sonar-reasoning-pro` per query.
-Review Perplexity's current per-model pricing before running this at the weekly-routine scale
+prioritizes completeness and citation quality over latency/cost — this is the deliberate default
+for both of this server's tools, confirmed 2026-08-26. There is no `perplexity_search` tool here to
+opt into a cheaper model for one-off queries; use Perplexity's official MCP server for that (see
+the correction at the top of this file). Review Perplexity's current per-model pricing before
+running this at the weekly-routine scale
 across dozens of companies — a full run enriches on the order of 50-90 companies plus one
 market-signals sweep, so the marginal cost of `sonar-pro` vs `sonar` compounds quickly.
