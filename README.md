@@ -22,9 +22,10 @@ Perplexity's official server, not instead of it.
 
 ## Tools
 
-- **`perplexity_company_news`** — structured company news brief (gouvernance, dirigeants, événements
-  stratégiques, situation financière, mouvements RH), fixed section headings, `lookback_days`
-  instead of free-text date ranges.
+- **`perplexity_company_news`** — structured company news brief (governance, executives, strategic
+  events, financial situation, senior HR moves), fixed section headings, `lookback_days` instead of
+  free-text date ranges. Output language is `fr` (default) or `en` via the `language` parameter —
+  headings switch accordingly (e.g. Gouvernance/Governance, Dirigeants/Executives).
 - **`perplexity_market_signals`** — sector-wide signal sweep (M&A, funding, appointments,
   restructurings) constrained to a JSON schema server-side, so the result is a real array of
   discrete signals, not markdown to re-parse. Returns an empty array (not an error) when nothing
